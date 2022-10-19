@@ -13,9 +13,11 @@ You can grade yourself using
 
 > NOTE: This version uses Python 3. On some systems you might need to invoke `python3`
 
+Follow good Git usage and commit and push at least once per question.
+
 ## Project 3: Reinforcement Learning
 
-<center>Version 1.001\. Last Updated: 08/26/2014\.</center>
+<center>Version 1.002\. Last Updated: 10/19/2022\.</center>
 
 * * *
 
@@ -300,6 +302,9 @@ As in Pacman, positions are represented by `(x,y)` Cartesian coordinates and any
 ### <a name="Q1"></a>Question 1 (6 points): Value Iteration
 
 
+Recall the value iteration state update equation:
+
+![value iteration equation](img/value_iteration_eqn.png)
 
 Write a value iteration agent in `ValueIterationAgent`, which has been partially specified for you in `value_iteration_agents.py`. Your value iteration agent is an offline planner, not a reinforcement learning agent, and so the relevant training option is the number of iterations of value iteration it should run (option `-i`) in its initial planning phase. `ValueIterationAgent` takes an MDP on construction and runs value iteration for the specified number of iterations before the constructor returns.
 
@@ -310,13 +315,12 @@ Value iteration computes k-step estimates of the optimal values, V<sub>k</sub>. 
 
 These quantities are all displayed in the GUI: values are numbers in squares, Q-values are numbers in square quarters, and policies are arrows out from each square.
 
-_Important:_ Use the "batch" version of value iteration where each vector V<sub>k</sub> is computed from a fixed vector V<sub>k-1</sub> (like in lecture), not the "online" version where one single weight vector is updated in place. This means that when a state's value is updated in iteration k based on the values of its successor states, the successor state values used in the value update computation should be those from iteration k-1 (even if some of the successor states had already been updated in iteration k). The difference is discussed in [Sutton & Barto](https://drive.google.com/open?id=1opPSz5AZ_kVa1uWOdOiveNiBFiEOHjkG
-) in the 2nd paragraph on page 75
+_Important:_ Use the "batch" version of value iteration where each vector V<sub>k</sub> is computed from a fixed vector V<sub>k-1</sub> (like in lecture), not the "online" ("in-place") version where one single weight vector is updated in place. This means that when a state's value is updated in iteration k based on the values of its successor states, the successor state values used in the value update computation should be those from iteration k-1 (even if some of the successor states had already been updated in iteration k). The difference is discussed in [Sutton & Barto](http://incompleteideas.net/sutton/book/RLbook2020.pdf) in the 2nd paragraph on page 75
  of chapter 4.1.
 
-_Note:_ A policy synthesized from values of depth k (which reflect the next k rewards) will actually reflect the next k+1 rewards (i.e. you return \(\pi_{k+1}\)). Similarly, the Q-values will also reflect one more reward than the values (i.e. you return Q<sub>k+1</sub>).
+_Note:_ A policy, π, synthesized from values of depth k (which reflect the next k rewards) will actually reflect the next k+1 rewards (i.e. you return (π<sub>k+1</sub>). Similarly, the Q-values will also reflect one more reward than the values (i.e. you return Q<sub>k+1</sub>).
 
-You should return the synthesized policy \(\pi_{k+1}\).
+You should return the synthesized policy (π<sub>k+1</sub>).
 
 _Hint:_ Use the `util.Counter` class in `util.py`, which is a dictionary with a default value of zero. Methods such as `total_count` should simplify your code. However, be careful with `arg_max`: the actual argmax you want may be a key not in the counter!
 
@@ -506,15 +510,13 @@ _Note:_ Approximate Q-learning assumes the existence of a feature function f(s,a
 
 The approximate Q-function takes the following form
 
-<center>\(Q(s,a) = \sum\limits_{i=1}^n f_i(s,a) w_i \)</center>
+Q(s,a) = Σ<sub>i=1</sub><sup>n</sup> f<sub>i</sub>(s,a) w<sub>i</sub>
 
 where each weight w<sub>i</sub> is associated with a particular feature f<sub>i</sub>(s,a). In your code, you should implement the weight vector as a dictionary mapping features (which the feature extractors will return) to weight values. You will update your weight vectors similarly to how you updated Q-values:
 
-<center>\(w_i \leftarrow w_i + \alpha \cdot difference \cdot f_i(s,a) \)</center>
+![Weight update](img/weight_update.png)
 
-<center>\( difference = (r + \gamma \max\limits_{a'} Q(s', a')) - Q(s,a) \)</center>
-
-Note that the \(difference\) term is the same as in normal Q-learning, and \( r \) is the experienced reward.
+Note that the `difference` term is the same as in normal Q-learning, and `r` is the experienced reward.
 
 By default, `ApproximateQAgent` uses the `IdentityExtractor`, which assigns a single feature to every `(state,action)` pair. With this feature extractor, your approximate Q-learning agent should work identically to `PacmanQAgent`. You can test this with the following command:
 
