@@ -23,8 +23,9 @@ value iteration.
 
 
 def question2():
-    answer_discount = None
-    answer_noise = None
+    answer_discount = 0.9
+    # no noise definitely makes it easier
+    answer_noise = 0
     return answer_discount, answer_noise
 
 
