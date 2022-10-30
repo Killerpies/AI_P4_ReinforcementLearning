@@ -12,7 +12,7 @@ The core projects and autograders were primarily created by John DeNero
 Student side autograding was added by Brad Miller, Nick Hay, and
 Pieter Abbeel (pabbeel@cs.berkeley.edu).
 """
-
+import util
 from feature_extractors import *
 from game import *
 from learning_agents import ReinforcementAgent
@@ -45,8 +45,8 @@ class QLearningAgent(ReinforcementAgent):
         :param args:
         """
         ReinforcementAgent.__init__(self, **args)
-
         # *** YOUR CODE HERE ***
+        self.values = util.Counter()
 
     def get_q_value(self, state, action):
         """
@@ -57,7 +57,7 @@ class QLearningAgent(ReinforcementAgent):
 
         # *** YOUR CODE HERE ***
 
-        util.raise_not_defined()
+        return self.values[(state,action)]
 
     def compute_value_from_q_values(self, state):
         """
@@ -69,18 +69,47 @@ class QLearningAgent(ReinforcementAgent):
 
         # *** YOUR CODE HERE ***
 
-        util.raise_not_defined()
+        actions = self.get_legal_actions(state)
+        if len(actions) == 0:
+            return 0.0
+        # compute_action_from_q_values(state)
+        bestAction = self.get_policy(state)
+        return self.get_q_value(state, bestAction)
 
     def compute_action_from_q_values(self, state):
         """
           Compute the best action to take in a state.  Note that if there
           are no legal actions, which is the case at the terminal state,
-          you should return None.
+          you should return None.line
         """
 
         # *** YOUR CODE HERE ***
 
-        util.raise_not_defined()
+        legalActions = self.get_legal_actions(state)
+        # is_terminal
+        if len(legalActions) == 0:
+            return None
+
+        # dict to store actions
+        # no util.counter because of this:
+        # Beware of the argmax function from util.Counter!
+        values = {}
+        bestQValue = float('-inf')
+        for action in legalActions:
+            # get que val for state action
+            tempQVal = self.get_q_value(state, action)
+            # insert into dict
+            values[action] = tempQVal
+            # looking for biggest qVal
+            if tempQVal > bestQValue:
+                bestQValue = tempQVal
+
+        bestActions = []
+        for action, value in values.items():
+            # List of all the highest qvalue actions so we can break tie
+            if value == bestQValue:
+                bestActions.append(action)
+        return random.choice(bestActions)
 
     def get_action(self, state):
         """
@@ -101,6 +130,7 @@ class QLearningAgent(ReinforcementAgent):
 
         util.raise_not_defined()
 
+
     def update(self, state, action, next_state, reward):
         """
           The parent class calls this to observe a
@@ -113,7 +143,12 @@ class QLearningAgent(ReinforcementAgent):
 
         # *** YOUR CODE HERE ***
 
-        util.raise_not_defined()
+        currentQVal = self.get_q_value(state, action)
+        nextStateQValue = self.get_value(next_state)
+        # currentval + learningRate * (reward + (discount * nextStateVal) - currentVal)
+        newQValue = currentQVal + self.alpha * (reward + (self.discount * nextStateQValue) - currentQVal)
+        # change this state/action qvalue to the new q value
+        self.values[(state, action)] = newQValue
 
     def get_policy(self, state):
         return self.compute_action_from_q_values(state)
