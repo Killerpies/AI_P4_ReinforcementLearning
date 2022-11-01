@@ -128,7 +128,15 @@ class QLearningAgent(ReinforcementAgent):
 
         # *** YOUR CODE HERE ***
 
-        util.raise_not_defined()
+        if len(legal_actions) == 0:
+            return action
+        if util.flip_coin(self.epsilon):
+            # random action if flip_coin returns true
+            action = random.choice(legal_actions)
+        else:
+            # get action from our policy
+            action = self.get_policy(state)
+        return action
 
 
     def update(self, state, action, next_state, reward):
@@ -213,8 +221,11 @@ class ApproximateQAgent(PacmanQAgent):
         """
 
         # *** YOUR CODE HERE ***
-
-        util.raise_not_defined()
+        features = self.feat_extractor.get_features(state, action)
+        # print(features)
+        qval = features * self.weights
+        return qval
+        # util.raise_not_defined()
 
     def update(self, state, action, next_state, reward):
         """
@@ -222,8 +233,10 @@ class ApproximateQAgent(PacmanQAgent):
         """
 
         # *** YOUR CODE HERE ***
-
-        util.raise_not_defined()
+        features = self.feat_extractor.get_features(state, action)
+        currentQValue = self.get_q_value(state, action)
+        # print(currentQValue)
+        # util.raise_not_defined()
 
     def final(self, state):
         """Called at the end of each game."""
@@ -235,5 +248,5 @@ class ApproximateQAgent(PacmanQAgent):
             # you might want to print your weights here for debugging
 
             # *** YOUR CODE HERE ***
-
+            print(self.weights)
             pass
