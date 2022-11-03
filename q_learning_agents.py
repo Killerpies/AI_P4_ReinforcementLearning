@@ -234,8 +234,14 @@ class ApproximateQAgent(PacmanQAgent):
 
         # *** YOUR CODE HERE ***
         features = self.feat_extractor.get_features(state, action)
-        currentQValue = self.get_q_value(state, action)
-        # print(currentQValue)
+        currentVal = self.get_q_value(state, action)
+        nextStateVal = self.get_value(next_state)
+        # same formula
+        # dif = (reward + (discount * nextStateVal) - currentVal)
+        dif = ((reward + self.discount * nextStateVal) - currentVal)
+        for feature in features:
+            tempWeight = self.alpha * dif * features[feature]
+            self.weights[feature] += tempWeight
         # util.raise_not_defined()
 
     def final(self, state):
